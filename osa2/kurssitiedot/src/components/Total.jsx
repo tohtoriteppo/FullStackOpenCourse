@@ -1,9 +1,5 @@
 const Total = ({parts}) => {
-    let total = 0
-    for(const part of parts)
-    {
-        total += part.exercises
-    }
+    const total = parts.reduce( (s, p) => s+p.exercises,0 )
     return (
         <>
             <b>total of {total} exercises</b>
