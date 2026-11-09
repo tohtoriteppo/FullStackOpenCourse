@@ -51,6 +51,7 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault()
+    const url = `http://localhost:3001/persons`
     if(persons.some(person => person.name === newName))
     {
       alert(`${newName} is already added to phonebook`)
@@ -60,7 +61,9 @@ const App = () => {
       name: newName,
       number: newNumber
     }
-    setPersons(persons.concat(personObject))
+    axios.post(url, personObject).then(response => {
+      setPersons(persons.concat(response.data))
+    })
   }
 
   const handleNameChange = (event) => {
