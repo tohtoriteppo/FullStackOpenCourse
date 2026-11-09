@@ -52,21 +52,32 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault()
-    const url = `http://localhost:3001/people`
     if(people.some(person => person.name === newName))
     {
-      alert(`${newName} is already added to phonebook`)
-      return
+      const person = people.find(person => person.name === newName);
+      if(window.confirm(`${person.name} is already added to phonebook, replace the old number with a new one?`))
+      {
+        const changedPerson = { ...person, number: newNumber }
+        peopleService
+        .update(changedPerson)
+          .then(returnedPerson => {
+            console.log(`response: ${returnedPerson}`)
+            setPeople(people.map(obj => obj.id !== person.id ? obj : returnedPerson))
+          })
+          
+      }
     }
-    const personObject = {
-      name: newName,
-      number: newNumber
+    else{
+      const personObject = {
+        name: newName,
+        number: newNumber
+      }
+      peopleService
+        .create(personObject)
+          .then(returnedPerson => {
+          setPeople(people.concat(returnedPerson))
+        })
     }
-    peopleService
-      .create(personObject)
-        .then(returnedPerson => {
-        setPeople(people.concat(returnedPerson))
-      })
   }
 
   const handleRemoveClick = (id) => {
