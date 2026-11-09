@@ -70,11 +70,14 @@ const App = () => {
   }
 
   const handleRemoveClick = (id) => {
-    console.log("clicked "+id);
-    peopleService
+    const person = people.find(person => person.id === id);
+    if(window.confirm(`Delete ${person.name}?`))
+    {
+      peopleService
       .remove(id).then(
         setPeople(people.filter(person => person.id !== id))
       )
+    }
   }
 
   const handleNameChange = (event) => {
