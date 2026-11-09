@@ -1,5 +1,5 @@
 {
-  "persons": [
+  "people": [
     {
       "name": "Arto Hellas",
       "number": "040-123456",
@@ -44,6 +44,11 @@
       "name": "uuno",
       "number": "29",
       "id": "ArBJBxh3Ai0"
+    },
+    {
+      "name": "juukko",
+      "number": "102",
+      "id": "WwXGDCdsmE4"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
