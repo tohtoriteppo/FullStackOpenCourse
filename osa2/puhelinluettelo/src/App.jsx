@@ -26,11 +26,11 @@ const PersonForm = ({addPerson, newName, handleNameChange, newNumber, handleNumb
   )
 }
 
-const People = ({filtered}) => {
+const People = ({filtered, handleButtonClick}) => {
   return(
     <div>
       {filtered.map(person =>
-        <p key={person.name}>{person.name} {person.number}</p>
+        <p key={person.name}>{person.name} {person.number} <button onClick={() => handleButtonClick(person.id)}>Delete</button></p>
       )}
     </div>
   )
@@ -69,6 +69,14 @@ const App = () => {
       })
   }
 
+  const handleRemoveClick = (id) => {
+    console.log("clicked "+id);
+    peopleService
+      .remove(id).then(
+        setPeople(people.filter(person => person.id !== id))
+      )
+  }
+
   const handleNameChange = (event) => {
     setNewName(event.target.value)
   }
@@ -89,7 +97,7 @@ const App = () => {
       <h3>Add a new</h3>
       <PersonForm addPerson={addPerson} newName={newName} handleNameChange={handleNameChange} newNumber={newNumber} handleNumberChange={handleNumberChange}></PersonForm>
       <h3>Numbers</h3>
-      <People filtered={filtered}></People>
+      <People filtered={filtered} handleButtonClick={handleRemoveClick}></People>
     </div>
   )
 }
