@@ -1,46 +1,17 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import peopleService from './services/people'
+import Filter from './components/Filter'
+import Notification from './components/Notification'
+import PersonForm from './components/PersonForm'
+import People from './components/People'
 
-const Filter = ({filter, handleFilterChange}) => {
-  return(
-    <div>
-      filter shown with <input value={filter} onChange={handleFilterChange}/>
-    </div>
-  )
-}
-
-const PersonForm = ({addPerson, newName, handleNameChange, newNumber, handleNumberChange}) => {
-  return(
-    <form onSubmit={addPerson}>
-      <div>
-        name: <input value={newName} onChange={handleNameChange} />
-      </div>
-      <div>
-        number: <input value={newNumber} onChange={handleNumberChange}/>
-      </div>
-      <div>
-        <button type="submit">add</button>
-      </div>
-    </form>
-  )
-}
-
-const People = ({filtered, handleButtonClick}) => {
-  return(
-    <div>
-      {filtered.map(person =>
-        <p key={person.name}>{person.name} {person.number} <button onClick={() => handleButtonClick(person.id)}>Delete</button></p>
-      )}
-    </div>
-  )
-}
 
 const App = () => {
   const [people, setPeople] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+  const [errorMessage, setErrorMessage] = useState('some error happened...')
 
   useEffect(() => {
     peopleService
@@ -61,8 +32,13 @@ const App = () => {
         peopleService
         .update(changedPerson)
           .then(returnedPerson => {
-            console.log(`response: ${returnedPerson}`)
             setPeople(people.map(obj => obj.id !== person.id ? obj : returnedPerson))
+            setErrorMessage(
+              `Updated number of '${returnedPerson.name}'`
+            )
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 3000)
           })
           
       }
@@ -76,6 +52,12 @@ const App = () => {
         .create(personObject)
           .then(returnedPerson => {
           setPeople(people.concat(returnedPerson))
+          setErrorMessage(
+            `Added '${personObject.name}'`
+          )
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 3000)
         })
     }
   }
@@ -85,9 +67,15 @@ const App = () => {
     if(window.confirm(`Delete ${person.name}?`))
     {
       peopleService
-      .remove(id).then(
+      .remove(id).then(() => {
         setPeople(people.filter(person => person.id !== id))
-      )
+        setErrorMessage(
+            `Deleted '${person.name}'`
+          )
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 3000)
+      })
     }
   }
 
@@ -107,6 +95,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={errorMessage} />
       <Filter filter={filter} handleFilterChange={handleFilterChange}></Filter>
       <h3>Add a new</h3>
       <PersonForm addPerson={addPerson} newName={newName} handleNameChange={handleNameChange} newNumber={newNumber} handleNumberChange={handleNumberChange}></PersonForm>
