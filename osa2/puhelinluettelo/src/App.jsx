@@ -12,6 +12,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
   const [errorMessage, setErrorMessage] = useState('some error happened...')
+  const [messageColor, setMessageColor] = useState('green')
 
   useEffect(() => {
     peopleService
@@ -30,17 +31,20 @@ const App = () => {
       {
         const changedPerson = { ...person, number: newNumber }
         peopleService
-        .update(changedPerson)
-          .then(returnedPerson => {
-            setPeople(people.map(obj => obj.id !== person.id ? obj : returnedPerson))
-            setErrorMessage(
-              `Updated number of '${returnedPerson.name}'`
-            )
-            setTimeout(() => {
-              setErrorMessage(null)
-            }, 3000)
-          })
-          
+          .update(changedPerson).then(returnedPerson => {
+              setPeople(people.map(obj => obj.id !== person.id ? obj : returnedPerson))
+              setErrorMessage(`Updated number of ${returnedPerson.name}`)
+              setMessageColor('green')
+              setTimeout(() => {
+                setErrorMessage(null)
+              }, 3000)
+            })
+            .catch(error => {
+              setErrorMessage(`Information of ${changedPerson.name} has already been removed from server`)
+              setMessageColor('red')
+              setPeople(people.filter(n => n.id !== person.id))
+            })
+            
       }
     }
     else{
@@ -52,9 +56,8 @@ const App = () => {
         .create(personObject)
           .then(returnedPerson => {
           setPeople(people.concat(returnedPerson))
-          setErrorMessage(
-            `Added '${personObject.name}'`
-          )
+          setErrorMessage(`Added ${personObject.name}`)
+          setMessageColor('green')
           setTimeout(() => {
             setErrorMessage(null)
           }, 3000)
@@ -69,9 +72,8 @@ const App = () => {
       peopleService
       .remove(id).then(() => {
         setPeople(people.filter(person => person.id !== id))
-        setErrorMessage(
-            `Deleted '${person.name}'`
-          )
+        setErrorMessage(`Deleted ${person.name}`)
+        setMessageColor('green')
         setTimeout(() => {
           setErrorMessage(null)
         }, 3000)
@@ -95,7 +97,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={errorMessage} />
+      <Notification message={errorMessage} messageColor={messageColor}/>
       <Filter filter={filter} handleFilterChange={handleFilterChange}></Filter>
       <h3>Add a new</h3>
       <PersonForm addPerson={addPerson} newName={newName} handleNameChange={handleNameChange} newNumber={newNumber} handleNumberChange={handleNumberChange}></PersonForm>
